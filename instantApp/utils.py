@@ -88,5 +88,6 @@ def statusVo(message, status):
 def args_verification(*args):
     for each in args:
         if each is None:
+            print("Arguement ", each, " is None")
             return False
     return True

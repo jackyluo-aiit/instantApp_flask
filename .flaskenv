@@ -9,3 +9,5 @@ MAIL_USERNAME = "apikey"
 
 SENDGRID_API_KEY = "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"
 
+WEBSOCKET_URL = "http://localhost:8001/api/a4/broadcast_room"
+

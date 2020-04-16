@@ -42,6 +42,10 @@ class Message(db.Model):
             del dict["_sa_instance_state"]
         return dict
 
+    def __repr__(self):
+        return {'chatroom_id': self.chatroom_id, 'user_id': self.user_id, 'name': self.name, 'message': self.message,
+                'message_time': self.message_time.strftime('%Y-%m-%d %H:%M')}
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'

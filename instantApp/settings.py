@@ -18,6 +18,8 @@ class BaseConfig():
     MAIL_PASSWORD = os.getenv('SENDGRID_API_KEY')
     MAIL_DEFAULT_SENDER = ("instantApp", "instantApp.iems@example.com")
 
+    WEBSOCKET_URL = os.getenv("WEBSOCKET_URL")
+
 
 class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv('DEVELOPMENT_SQLALCHEMY_DATABASE_URI')
