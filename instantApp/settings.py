@@ -19,6 +19,9 @@ class BaseConfig():
     MAIL_DEFAULT_SENDER = ("instantApp", "instantApp.iems@example.com")
 
     WEBSOCKET_URL = os.getenv("WEBSOCKET_URL")
+    UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
+    SENDFILE_URL = os.getenv("SENDFILE_URL")
+    ALLOWED_EXTENSIONS = os.getenv("ALLOWED_EXTENSIONS")
 
 
 class DevelopmentConfig(BaseConfig):

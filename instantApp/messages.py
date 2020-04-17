@@ -1,9 +1,12 @@
+import os
+
 import requests
 
 from instantApp.extensions import db
-from instantApp.models import Chatroom, Message, User
-from instantApp.utils import resultVo, args_verification, statusVo
-from flask import Blueprint, jsonify, request, redirect, url_for, current_app
+from instantApp.models import Chatroom, Message, User, File
+from instantApp.utils import resultVo, args_verification, statusVo, allowed_file
+from flask import Blueprint, jsonify, request, redirect, url_for, current_app, send_from_directory
+from werkzeug import secure_filename
 
 messages_bp = Blueprint('messages', __name__)
 
@@ -61,3 +64,50 @@ def sendMessage():
         return statusVo("Insert successfully.", "OK")
     else:
         return statusVo("Insert failed.", "ERROR")
+
+
+@messages_bp.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    url = current_app.config['SENDFILE_URL']
+    if request.method == 'POST':
+        file = request.files['file']  # input key-value parameter
+        uploader = request.args.get("name")  # the name of the user
+        chatroom_id = request.args.get("chatroom_id")
+        if file and allowed_file(file.filename) and args_verification(uploader, chatroom_id):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(os.path.dirname(current_app.root_path), upload_folder)
+            filepath = os.path.join(filepath, filename)
+            file.save(filepath)
+            f = File(file_name=filename, file_path=filepath, uploader=uploader)
+            db.session.add(f)
+            db.session.commit()
+            websocket_message = f.__repr__()
+            websocket_message["username"] = uploader
+            websocket_message["chatroom_id"] = chatroom_id
+            res = requests.post(url=url, json=websocket_message)
+            result = res.json()
+            print(result)
+            if result['status'] == 'OK':
+                return statusVo("Send file successfully.", "OK")
+            else:
+                return statusVo("Send file failed.", "ERROR")
+        else:
+            return statusVo("Upload Failed.", "ERROR")
+    else:
+        return statusVo("Upload Failed.", "ERROR")
+
+
+@messages_bp.route('/upload/<filename>')
+def download(filename):
+    print(filename)
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    # filename = request.args.get("filename")
+    if request.method == 'GET' and args_verification(filename):
+        uploads = os.path.join(os.path.dirname(current_app.root_path), upload_folder)
+        if os.path.isfile(os.path.join(uploads, filename)):
+            return send_from_directory(uploads, filename, as_attachment=True)
+        else:
+            return statusVo("File does not exist.", "ERROR")
+    else:
+        return statusVo("Method mismatch.", "ERROR")

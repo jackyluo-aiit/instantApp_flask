@@ -91,3 +91,8 @@ def args_verification(*args):
             print("Arguement ", each, " is None")
             return False
     return True
+
+
+def allowed_file(filename):
+    extensions = set(current_app.config['ALLOWED_EXTENSIONS'].split(','))
+    return '.' in filename and filename.rsplit('.', 1)[1] in extensions

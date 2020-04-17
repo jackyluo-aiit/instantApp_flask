@@ -68,3 +68,23 @@ class User(db.Model, UserMixin):
 
     def validate_password(self, password):
         return check_password_hash(self.password, password)
+
+
+class File(db.Model):
+    __tablename__ = 'files'
+
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    file_name = db.Column(db.String(200))
+    file_path = db.Column(db.String(64), nullable=False)
+    uploader = db.Column(db.String(20), nullable=False)
+    upload_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), default=datetime.utcnow, index=True)
+
+    def to_json(self):
+        dict = self.__dict__
+        if "_sa_instance_state" in dict:
+            del dict["_sa_instance_state"]
+        return dict
+
+    def __repr__(self):
+        return {'id': self.id, 'file_name': self.file_name, 'file_path': self.file_path, 'uploader': self.uploader,
+                'upload_time': self.upload_time.strftime('%Y-%m-%d %H:%M')}
