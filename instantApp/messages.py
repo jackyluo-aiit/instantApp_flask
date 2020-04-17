@@ -73,18 +73,20 @@ def upload_file():
     if request.method == 'POST':
         file = request.files['file']  # input key-value parameter
         uploader = request.args.get("name")  # the name of the user
+        uploader_id = request.args.get("user_id")
         chatroom_id = request.args.get("chatroom_id")
         if file and allowed_file(file.filename) and args_verification(uploader, chatroom_id):
             filename = secure_filename(file.filename)
             filepath = os.path.join(os.path.dirname(current_app.root_path), upload_folder)
             filepath = os.path.join(filepath, filename)
             file.save(filepath)
-            f = File(file_name=filename, file_path=filepath, uploader=uploader)
+            f = File(file_name=filename, file_path=filepath, uploader_id=int(uploader_id))
             db.session.add(f)
             db.session.commit()
             websocket_message = f.__repr__()
             websocket_message["username"] = uploader
             websocket_message["chatroom_id"] = chatroom_id
+            websocket_message["api_path"] = url_for("messages.download", filename=filename)
             res = requests.post(url=url, json=websocket_message)
             result = res.json()
             print(result)

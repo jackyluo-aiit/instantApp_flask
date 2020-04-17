@@ -76,7 +76,7 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     file_name = db.Column(db.String(200))
     file_path = db.Column(db.String(64), nullable=False)
-    uploader = db.Column(db.String(20), nullable=False)
+    uploader_id = db.Column(db.Integer, nullable=False)
     upload_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), default=datetime.utcnow, index=True)
 
     def to_json(self):
@@ -86,5 +86,5 @@ class File(db.Model):
         return dict
 
     def __repr__(self):
-        return {'id': self.id, 'file_name': self.file_name, 'file_path': self.file_path, 'uploader': self.uploader,
+        return {'id': self.id, 'file_name': self.file_name, 'file_path': self.file_path, 'uploader': self.uploader_id,
                 'upload_time': self.upload_time.strftime('%Y-%m-%d %H:%M')}

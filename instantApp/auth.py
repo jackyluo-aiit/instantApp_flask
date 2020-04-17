@@ -43,7 +43,7 @@ def register():
     db.session.commit()
     token = generate_token(user=user, operation=Operations.CONFIRM)
     send_confirm_account_email(user=user, token=token)
-    return redirect(url_for('login', email=email, password=password))
+    return redirect(url_for('auth.login', email=email, password=password))
 
 
 @auth_bp.route('/logout')
