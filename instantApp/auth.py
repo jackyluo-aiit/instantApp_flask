@@ -4,8 +4,11 @@ from flask_login import login_required
 from instantApp.extensions import db
 from instantApp.models import Chatroom, Message, User
 from flask_login import current_user, login_user, login_required, logout_user
-from instantApp.utils import generate_token, send_mail_test, send_confirm_account_email, validate_token, resultVo, args_verification, statusVo
+from instantApp.utils import generate_token, send_mail_test, send_confirm_account_email, validate_token, resultVo, \
+    args_verification, statusVo, send_captcha
 from instantApp.settings import Operations
+import instantApp.cache_utils as cache
+import string, random
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -35,16 +38,56 @@ def register():
     name = request.args.get("name")
     password = request.args.get("password")
     email = request.args.get("email")
-    if not args_verification(name, password, email):
+    mark = request.args.get("mark")  # to see if the user want to use captcha or not
+    if not args_verification(name, password, email, mark):
         return statusVo("Arguments mismatch.", "ERROR")
     user = User(name=name, email=email)
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
-    token = generate_token(user=user, operation=Operations.CONFIRM)
-    send_confirm_account_email(user=user, token=token)
-    return redirect(url_for('auth.login', email=email, password=password))
+    if mark == "captcha":
+        source = list(string.ascii_letters)
+        source.extend(map(lambda x: str(x), range(0, 10)))
+        # source.extend(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
+        captcha = "".join(random.sample(source, 6))  # randomly select 6 digits
+        send_captcha(user=user, captcha=captcha)
+        cache.set(email, captcha)  # store captcha into cache
+        return statusVo("Send captcha success.", "OK")
+    else:
+        token = generate_token(user=user, operation=Operations.CONFIRM)
+        send_confirm_account_email(user=user, token=token)
+        return statusVo("Send confirm email success.", "OK")
+        # return redirect(url_for('auth.login', email=email, password=password))
 
+
+@auth_bp.route('/validate_captcha')
+def validate_captcha():
+    captcha = request.args.get("captcha")
+    email = request.args.get("email")
+    if not args_verification(captcha, email):
+        return statusVo("Arguments mismatch.", "ERROR")
+    cache_captcha = cache.get(email)
+    if cache_captcha and cache_captcha.lower() == captcha:
+        user = User.query.filter(User.email == email).one_or_none()
+        if user is None:
+            return statusVo("This email has been used", "ERROR")
+        else:
+            user.confirm = True
+            return statusVo("This user has been confirmed.", "OK")
+    else:
+        return statusVo("The captcha is not correct", "ERROR")
+
+
+# @auth_bp.route('/email_captcha')
+# def email_captcha():
+#     email = request.args.get("email")
+#     if not args_verification(email):
+#         return statusVo("Arguments mismatch.", "ERROR")
+#     source = list(string.ascii_letters)
+#     source.extend(map(lambda x: str(x), range(0, 10)))
+#     # source.extend(["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"])
+#     captcha = "".join(random.sample(source, 6))  # randomly select 6 digits
+#     send_captcha()
 
 @auth_bp.route('/logout')
 @login_required

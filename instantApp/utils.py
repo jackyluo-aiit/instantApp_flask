@@ -6,7 +6,6 @@ from flask_mail import Message
 from instantApp import mail, db
 from instantApp.models import User
 from instantApp.settings import Operations
-import uuid, memcache
 
 
 def generate_token(user, operation, expire_in=None, **kwargs):
@@ -40,16 +39,20 @@ def send_confirm_account_email(user, token):
     send_mail(subject='Email Confirm', to=user.email, template='emails/confirm', user=user, token=token)
 
 
-def send_email_captcha(user):
-    mc = memcache.Client(['127.0.0.1:12000'], debug=False)
-    captcha = str(uuid.uuid1())[:6]
-    mc.set(user.email, captcha)
-    message = Message('instantApp verification code', recipients=[user.email],
-                      body='Your verification code: %s' % captcha)
-    app = current_app._get_current_object()
-    thr = Thread(target=_send_async_mail, args=[app, message])
-    thr.start()
-    return thr
+def send_captcha(user, captcha):
+    send_mail(subject='Email Captcha', to=user.email, template='emails/captcha_confirm', captcha=captcha)
+
+
+# def send_email_captcha(user):
+#     mc = memcache.Client(['127.0.0.1:12000'], debug=False)
+#     captcha = str(uuid.uuid1())[:6]
+#     mc.set(user.email, captcha)
+#     message = Message('instantApp verification code', recipients=[user.email],
+#                       body='Your verification code: %s' % captcha)
+#     app = current_app._get_current_object()
+#     thr = Thread(target=_send_async_mail, args=[app, message])
+#     thr.start()
+#     return thr
 
 
 def send_mail(subject, to, template, **kwargs):
