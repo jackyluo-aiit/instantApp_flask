@@ -15,8 +15,8 @@ class BaseConfig():
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
-    MAIL_PASSWORD = os.getenv('SENDGRID_API_KEY')
-    MAIL_DEFAULT_SENDER = ("instantApp", "instantApp.iems@example.com")
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = ("instantApp", MAIL_USERNAME)
 
     WEBSOCKET_URL = os.getenv("WEBSOCKET_URL")
     UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER")
