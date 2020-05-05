@@ -1,7 +1,7 @@
 FLASK_APP=instantApp
 FLASK_ENV=development
 
-PRODUCTION_SQLALCHEMY_DATABASE_URI = "mysql+pymysql://lxq:123456@3.91.157.112:3306/iems5722"
+PRODUCTION_SQLALCHEMY_DATABASE_URI = "mysql+pymysql://lxq:123456@52.90.218.14:3306/iems5722"
 DEVELOPMENT_SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:JK970227456gjk@localhost:3306/iems5722"
 
 MAIL_SERVER = "smtp.qq.com"

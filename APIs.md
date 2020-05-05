@@ -170,7 +170,23 @@
             status: "ERROR"
         }
     ```
-    
+
+##socket接收信息
+- Event: room_message
+- Message: 
+    ```
+    {
+        message:   
+    }
+    ```
+##socket接收文件信息
+- Event: file_message
+- Message:
+    ```
+    {
+        file:   
+    }
+    ```
 
  
     
