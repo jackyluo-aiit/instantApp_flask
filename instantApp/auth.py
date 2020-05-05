@@ -62,11 +62,12 @@ def register():
 
 @auth_bp.route('/validate_captcha', methods=['POST'])
 def validate_captcha():
-    captcha = request.args.get("captcha")
+    captcha = request.args.get("captcha").lower()
     email = request.args.get("email")
     if not args_verification(captcha, email):
         return statusVo("Arguments mismatch.", "ERROR")
     cache_captcha = cache.get(email)
+    print(cache_captcha)
     if cache_captcha and cache_captcha.lower() == captcha:
         user = User.query.filter(User.email == email).one_or_none()
         if user is None:

@@ -1,9 +1,9 @@
 import memcache
 
-cache = memcache.Client(['127.0.0.1:11211'], debug=True)
+cache = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 
-def set(key, value, timeout=60):
+def set(key, value, timeout=5*60):
     return cache.set(key, value, timeout)
 
 

@@ -40,7 +40,7 @@ def send_confirm_account_email(user, token):
 
 
 def send_captcha(user, captcha):
-    send_mail(subject='Email Captcha', to=user.email, template='emails/captcha_confirm', captcha=captcha)
+    send_mail(subject='Email Captcha', to=user.email, template='emails/captcha_confirm', captcha=captcha, user=user)
 
 
 # def send_email_captcha(user):

@@ -46,10 +46,10 @@ def getMessages():
 @messages_bp.route('/api/a3/send_message', methods=["POST"])
 def sendMessage():
     url = current_app.config['WEBSOCKET_URL']
-    chatroom_id = request.args.get("chatroom_id")
-    user_id = request.args.get("user_id")
-    name = request.args.get("name")
-    message = request.args.get("message")
+    chatroom_id = request.form.get("chatroom_id")
+    user_id = request.form.get("user_id")
+    name = request.form.get("name")
+    message = request.form.get("message")
     if not args_verification(chatroom_id, user_id, name, message):
         return statusVo("Arguments mismatch.", "ERROR")
     message = Message(chatroom_id=chatroom_id, user_id=user_id, name=name, message=message)
