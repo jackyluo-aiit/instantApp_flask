@@ -13,7 +13,6 @@ def create_app(config_name='development'):
     app.config.from_object(config[config_name])
     app.register_blueprint(messages_bp)
     app.register_blueprint(auth_bp, url_prefix='/auth')
-    # app.register_blueprint(chats_bp)
     register_extensions(app)
 
     @login_manager.user_loader

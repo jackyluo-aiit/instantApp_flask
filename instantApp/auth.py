@@ -60,7 +60,7 @@ def register():
         # return redirect(url_for('auth.login', email=email, password=password))
 
 
-@auth_bp.route('/validate_captcha')
+@auth_bp.route('/validate_captcha', methods=['POST'])
 def validate_captcha():
     captcha = request.args.get("captcha")
     email = request.args.get("email")
@@ -70,7 +70,7 @@ def validate_captcha():
     if cache_captcha and cache_captcha.lower() == captcha:
         user = User.query.filter(User.email == email).one_or_none()
         if user is None:
-            return statusVo("This email has been used", "ERROR")
+            return statusVo("This email has been used.", "ERROR")
         else:
             user.confirm = True
             return statusVo("This user has been confirmed.", "OK")

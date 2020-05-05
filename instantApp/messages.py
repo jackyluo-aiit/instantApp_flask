@@ -6,7 +6,7 @@ from instantApp.extensions import db
 from instantApp.models import Chatroom, Message, User, File
 from instantApp.utils import resultVo, args_verification, statusVo, allowed_file
 from flask import Blueprint, jsonify, request, redirect, url_for, current_app, send_from_directory
-from werkzeug import secure_filename
+from werkzeug.utils import secure_filename
 
 messages_bp = Blueprint('messages', __name__)
 
