@@ -29,9 +29,9 @@ def validate_token(token, operation):
         return False
     if operation == Operations.CONFIRM:
         user.confirm = True
+        db.session.commit()
     else:
         return False
-    db.session.commit()
     return True
 
 

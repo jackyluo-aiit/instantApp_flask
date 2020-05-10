@@ -9,6 +9,7 @@ from instantApp.utils import generate_token, send_mail_test, send_confirm_accoun
 from instantApp.settings import Operations
 import instantApp.cache_utils as cache
 import string, random
+from sqlalchemy.exc import IntegrityError
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -20,13 +21,16 @@ def login():
     password = request.args.get("password")
     if not args_verification(email, password):
         return statusVo("Arguments mismatch.", "ERROR")
-    if current_user.is_authenticated:
-        return statusVo("Verification success.", "OK")
     user = User.query.filter(User.email == email).first()
+    if current_user.is_authenticated:
+        print("User: ", current_user.email, "has been authenticated before.")
+        return jsonify(resultVo(user.__repr__(), "OK"))
     if user:
         if user.validate_password(password):
             login_user(user)
-            return statusVo("Verification success.", "OK")
+            if current_user.is_authenticated:
+                print("User: ", current_user.email, "has login.")
+                return jsonify(resultVo(user.__repr__(), "OK"))
         else:
             return statusVo("Verification failed.", "ERROR")
     else:
@@ -44,7 +48,10 @@ def register():
     user = User(name=name, email=email)
     user.set_password(password)
     db.session.add(user)
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        return statusVo("This email has been used.", "ERROR")
     if mark == "captcha":
         source = list(string.ascii_letters)
         source.extend(map(lambda x: str(x), range(0, 10)))
@@ -74,6 +81,7 @@ def validate_captcha():
             return statusVo("This email has been used.", "ERROR")
         else:
             user.confirm = True
+            db.session.commit()
             return statusVo("This user has been confirmed.", "OK")
     else:
         return statusVo("The captcha is not correct", "ERROR")
@@ -93,6 +101,8 @@ def validate_captcha():
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    if current_user.is_authenticated:
+        print("User: ", current_user.email, "has logout.")
     logout_user()
     return statusVo("Logout success.", "OK")
 
@@ -109,3 +119,9 @@ def confirm(token):
 def mail_test():
     send_mail_test()
     return statusVo("Send mail, please check.", "OK")
+
+
+@auth_bp.route('/test_cookie', methods=['GET'])
+@login_required
+def cookie_test():
+    return statusVo("Test success.", "OK")

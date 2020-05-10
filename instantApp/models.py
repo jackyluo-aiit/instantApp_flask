@@ -69,6 +69,10 @@ class User(db.Model, UserMixin):
     def validate_password(self, password):
         return check_password_hash(self.password, password)
 
+    def __repr__(self):
+        return {'id': self.id, 'name': self.name, 'create_time': self.create_time.strftime('%Y-%m-%d %H:%M'), 'email': self.email,
+                'confirm': self.confirm}
+
 
 class File(db.Model):
     __tablename__ = 'files'

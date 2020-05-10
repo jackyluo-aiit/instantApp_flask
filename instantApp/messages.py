@@ -52,10 +52,12 @@ def sendMessage():
     message = request.form.get("message")
     if not args_verification(chatroom_id, user_id, name, message):
         return statusVo("Arguments mismatch.", "ERROR")
+    chatroom = Chatroom.query.filter(Chatroom.id == chatroom_id).one_or_none()
     message = Message(chatroom_id=chatroom_id, user_id=user_id, name=name, message=message)
     db.session.add(message)
     db.session.commit()
     websocket_message = message.__repr__()
+    websocket_message['chatroom_name'] = chatroom.name
     print(websocket_message)
     res = requests.post(url=url, json=websocket_message)
     result = res.json()
