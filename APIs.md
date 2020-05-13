@@ -119,6 +119,12 @@
  
 ##上传文件
 调用此API将文件存放在服务器，然后通过websocket发送一个获得此文件的API的URL到指定聊天室
+文件类型：
+   + 1:文本
+   + 2:图片
+   + 3:语音
+   + 4:视频
+   + 5:其他文件
 ###request
 - Method: POST
 - URL: /upload
@@ -127,6 +133,7 @@
     + name
     + user_id
     + chatroom_id
+    + type
 - Response:
     + 发送文件成功
     ```

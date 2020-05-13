@@ -29,10 +29,12 @@ class Message(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     chatroom_id = db.Column(db.ForeignKey('chatrooms.id'), nullable=False, index=True)
-    user_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.String(254), nullable=False)
     name = db.Column(db.String(20), nullable=False)
-    message = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.String(200))
     message_time = db.Column(db.DateTime, server_default=db.FetchedValue(), default=datetime.utcnow, index=True)
+    type = db.Column(db.Integer, nullable=False)
+    file_id = db.Column(db.Integer, db.ForeignKey('files.id'))
 
     chatroom = db.relationship('Chatroom', primaryjoin='Message.chatroom_id == Chatroom.id', backref='messages')
 
@@ -80,8 +82,9 @@ class File(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
     file_name = db.Column(db.String(200))
     file_path = db.Column(db.String(64), nullable=False)
-    uploader_id = db.Column(db.Integer, nullable=False)
+    uploader_id = db.Column(db.String(254), nullable=False)
     upload_time = db.Column(db.DateTime, nullable=False, server_default=db.FetchedValue(), default=datetime.utcnow, index=True)
+    messages = db.relationship("Message")
 
     def to_json(self):
         dict = self.__dict__
